@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>株トレシミュレーター｜お子さんの「お金を育てる力」を、今のうちに</title>
+  <meta name="description" content="中学生〜20代の認知能力がピークの今、ゲームで投資を体験させる。実際の株価・リスクゼロ・買い切り24,800円。親が子どもに贈る金融教育ツール。">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0a0e1a;
+      --bg2:     #111827;
+      --bg3:     #1a2236;
+      --border:  #2a3550;
+      --text:    #e8eaf0;
+      --text2:   #8892a4;
+      --accent:  #f59e0b;
+      --accent2: #fbbf24;
+      --green:   #10b981;
+      --red:     #ef4444;
+      --blue:    #6366f1;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+      line-height: 1.8;
+      font-size: 18px;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,14,26,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 60px;
+    }
+    .nav-logo {
+      font-size: 17px; font-weight: 700; color: var(--accent);
+      letter-spacing: 0.03em;
+    }
+    .nav-cta {
+      background: var(--accent); color: #000;
+      padding: 8px 22px; border-radius: 6px;
+      font-weight: 700; font-size: 14px;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--accent2); color: #000; }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 100px 20px 60px;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,158,11,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(99,102,241,0.06) 0%, transparent 60%),
+        var(--bg);
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.4);
+      color: var(--accent);
+      font-size: 12px; font-weight: 700;
+      padding: 4px 14px; border-radius: 20px;
+      letter-spacing: 0.08em; margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(30px, 5.5vw, 58px);
+      font-weight: 900; line-height: 1.25;
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-sub {
+      font-size: clamp(15px, 2.5vw, 19px);
+      color: var(--text2); max-width: 620px; margin: 0 auto 36px;
+      line-height: 1.9;
+    }
+    .hero-cta-wrap { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--accent); color: #000;
+      padding: 16px 40px; border-radius: 8px;
+      font-weight: 800; font-size: 17px;
+      transition: transform 0.15s, background 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-2px); color: #000; }
+    .btn-outline {
+      border: 1.5px solid var(--border); color: var(--text2);
+      padding: 16px 32px; border-radius: 8px;
+      font-weight: 600; font-size: 16px;
+      transition: border-color 0.2s, color 0.2s;
+      display: inline-block;
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-note {
+      margin-top: 16px; font-size: 15px; color: var(--text2);
+    }
+
+    /* ===== MOCK CHART ===== */
+    .hero-chart {
+      max-width: 900px; margin: 60px auto 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,158,11,0.1);
+    }
+    .hero-chart-bar {
+      background: var(--bg2);
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px; color: var(--text2);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .hero-chart-body {
+      background: var(--bg);
+      height: 340px;
+      position: relative; overflow: hidden;
+    }
+    .chart-label {
+      position: absolute; bottom: 8px; left: 0; right: 0;
+      display: flex; justify-content: space-around;
+      font-size: 10px; color: var(--text2);
+      pointer-events: none;
+    }
+
+    /* ===== SECTION ===== */
+    section { padding: 80px 20px; }
+    .section-inner { max-width: 1000px; margin: 0 auto; }
+    .section-label {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+      color: var(--accent); margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .section-title {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 800; line-height: 1.3;
+      margin-bottom: 16px;
+    }
+    .section-desc {
+      color: var(--text2); font-size: 17px; max-width: 600px;
+      margin-bottom: 48px; line-height: 1.9;
+    }
+
+    /* ===== PROBLEM ===== */
+    .problem { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
+    }
+    .problem-card {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 24px;
+    }
+    .problem-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .problem-card p { font-size: 15px; color: var(--text2); line-height: 1.8; }
+
+    /* ===== FEATURES ===== */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;
+    }
+    .feature-card {
+      background: linear-gradient(145deg, var(--bg2) 0%, rgba(26,34,54,0.95) 100%);
+      border: 1px solid var(--border);
+      border-radius: 18px; padding: 32px;
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s, transform 0.25s, box-shadow 0.3s;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feature-card:hover {
+      border-color: rgba(245,158,11,0.45);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 56px rgba(0,0,0,0.5), 0 0 32px rgba(245,158,11,0.07);
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-card-num {
+      position: absolute; top: 18px; right: 22px;
+      font-size: 52px; font-weight: 900; line-height: 1;
+      color: rgba(245,158,11,0.06); user-select: none;
+      pointer-events: none;
+    }
+    .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+    .feature-card p { font-size: 15px; color: var(--text2); line-height: 1.8; }
+
+    /* ===== HOW IT WORKS ===== */
+    .how { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .steps {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0; position: relative;
+    }
+    .step {
+      padding: 32px 24px; text-align: center; position: relative;
+    }
+    .step:not(:last-child)::after {
+      content: '→'; position: absolute; right: -12px; top: 50%;
+      transform: translateY(-50%); font-size: 20px; color: var(--border);
+    }
+    .step-num {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--accent); color: #000;
+      font-weight: 900; font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .step h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .step p { font-size: 15px; color: var(--text2); line-height: 1.8; }
+
+    /* ===== TARGET ===== */
+    .target-list {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;
+    }
+    .target-item {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px 20px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .target-check { color: var(--green); font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .target-item p { font-size: 16px; color: var(--text2); line-height: 1.7; }
+
+    /* ===== STATS ===== */
+    .stats { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 32px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: clamp(32px, 5vw, 48px); font-weight: 900; color: var(--accent);
+      line-height: 1;
+    }
+    .stat-label { font-size: 15px; color: var(--text2); margin-top: 6px; }
+
+    /* ===== PRICING ===== */
+    .pricing-card {
+      max-width: 520px; margin: 0 auto;
+      background: var(--bg2);
+      border: 2px solid var(--accent);
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 0 40px rgba(245,158,11,0.12);
+    }
+    .pricing-head {
+      background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05));
+      padding: 32px; text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .pricing-badge {
+      display: inline-block;
+      background: var(--accent); color: #000;
+      font-size: 11px; font-weight: 800;
+      padding: 3px 12px; border-radius: 20px;
+      letter-spacing: 0.08em; margin-bottom: 16px;
+    }
+    .pricing-name { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .pricing-price {
+      font-size: clamp(40px, 8vw, 60px); font-weight: 900; color: var(--accent);
+      line-height: 1;
+    }
+    .pricing-price span { font-size: 20px; font-weight: 600; }
+    .pricing-note { font-size: 15px; color: var(--text2); margin-top: 8px; }
+    .pricing-body { padding: 32px; }
+    .pricing-features { list-style: none; margin-bottom: 28px; }
+    .pricing-features li {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 16px;
+    }
+    .pricing-features li:last-child { border-bottom: none; }
+    .pricing-features li::before { content: '✓'; color: var(--green); font-weight: 700; }
+    .pricing-cta {
+      display: block; text-align: center;
+      background: var(--accent); color: #000;
+      padding: 18px; border-radius: 8px;
+      font-weight: 800; font-size: 18px;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .pricing-cta:hover { background: var(--accent2); transform: translateY(-2px); color: #000; }
+    .pricing-guarantee {
+      text-align: center; font-size: 14px; color: var(--text2);
+      margin-top: 16px;
+    }
+
+    /* ===== FAQ ===== */
+    .faq { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .faq-list { max-width: 680px; }
+    .faq-item {
+      border-bottom: 1px solid var(--border); padding: 20px 0;
+    }
+    .faq-q {
+      font-size: 17px; font-weight: 700; margin-bottom: 10px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .faq-q::before { content: 'Q'; color: var(--accent); font-weight: 900; flex-shrink: 0; }
+    .faq-a {
+      font-size: 16px; color: var(--text2); line-height: 1.9;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .faq-a::before { content: 'A'; color: var(--text2); font-weight: 700; flex-shrink: 0; }
+
+    /* ===== FINAL CTA ===== */
+    .final-cta {
+      text-align: center;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 50%, rgba(245,158,11,0.07) 0%, transparent 70%),
+        var(--bg);
+      padding: 100px 20px;
+    }
+    .final-cta h2 {
+      font-size: clamp(26px, 5vw, 44px);
+      font-weight: 900; margin-bottom: 16px; line-height: 1.3;
+    }
+    .final-cta p { color: var(--text2); margin-bottom: 36px; font-size: 16px; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--bg2); border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+      font-size: 12px; color: var(--text2);
+    }
+    footer a { color: var(--text2); }
+    footer a:hover { color: var(--accent); }
+
+    /* ===== RESPONSIVE ===== */
+
+    @media (max-width: 860px) {
+      /* Kids 2カラム → 1カラム */
+      .kids-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
+    }
+
+    @media (max-width: 768px) {
+      /* SECTION padding */
+      section { padding: 56px 20px; }
+
+      /* HERO */
+      .hero { padding: 84px 20px 48px; }
+      .hero-cta-wrap { flex-direction: column; align-items: center; }
+      .btn-primary, .btn-outline {
+        width: min(100%, 360px);
+        text-align: center;
+        padding-left: 20px; padding-right: 20px;
+      }
+
+      /* チャート高さを縮小 */
+      .hero-chart-body { height: 220px !important; }
+
+      /* チャートのタイトルバー省略 */
+      .chart-bar-detail { display: none; }
+
+      /* 学術論文グリッド：幅不足時にスクロールしない */
+      .evidence-grid { grid-template-columns: 1fr !important; }
+
+      /* Steps */
+      .step:not(:last-child)::after { display: none; }
+      .steps { gap: 16px; }
+
+      /* Stats */
+      .stats-grid { gap: 20px; }
+
+      /* 認知能力バー内ラベルのはみ出し対策 */
+      .peak-label { font-size: 9px !important; }
+
+      /* Pricing compare */
+      .price-compare-row {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 2px !important;
+      }
+      .price-compare-value { font-size: 13px !important; }
+
+      /* FAQ */
+      .faq-list { max-width: 100%; }
+
+      /* Footer */
+      footer { padding: 24px 20px; justify-content: center; text-align: center; flex-direction: column; }
+      footer div:last-child { flex-wrap: wrap; justify-content: center; gap: 16px; }
+    }
+
+    @media (max-width: 540px) {
+      .rg-grid { grid-template-columns: 1fr !important; }
+    }
+
+    @media (max-width: 480px) {
+      /* NAV */
+      nav { padding: 0 14px; }
+      .nav-logo { font-size: 14px; }
+
+      /* SECTION padding */
+      section { padding: 48px 14px; }
+
+      /* HERO */
+      .hero { padding: 76px 14px 40px; }
+      .hero-badge { font-size: 11px; padding: 3px 10px; }
+      .hero-note { font-size: 12px; }
+
+      /* Hero chart bar: コンパクト化 */
+      .hero-chart-bar { padding: 8px 12px; font-size: 11px; gap: 6px; }
+      .hero-chart-body { height: 180px !important; }
+
+      /* Pricing card */
+      .pricing-card { margin: 0; }
+      .pricing-head { padding: 24px 20px; }
+      .pricing-body { padding: 24px 20px; }
+      .pricing-cta { font-size: 16px; padding: 15px; }
+
+      /* Section title */
+      .section-title { font-size: clamp(20px, 6vw, 30px); }
+
+      /* Target list: 1カラム強制 */
+      .target-list { grid-template-columns: 1fr !important; }
+
+      /* Age peak bar ラベル非表示 */
+      .peak-label { display: none !important; }
+
+      /* Steps: text縮小 */
+      .step { padding: 20px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">📈 株トレシミュレーター</div>
+  <a href="#pricing" class="nav-cta">購入する — ¥24,800</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-badge">親が子どもに贈る金融教育ツール ／ 買い切り ／ Windows 対応</div>
+    <h1>お子さんの<span>「お金を育てる力」</span>を、<br>今のうちに。</h1>
+    <p class="hero-sub">
+      学校では教えてくれない「投資の感覚」を、<strong style="color:var(--accent)">実際の株価データ</strong>を使ったゲームで体験させる。
+      実際のお金を使わずに、何度でも失敗して学べる——
+      認知能力がピークの中学生〜20代だからこそ、今が習い時です。
+    </p>
+    <div class="hero-cta-wrap">
+      <a href="#pricing" class="btn-primary">今すぐ購入する — ¥24,800</a>
+      <a href="#features" class="btn-outline">どんなアプリ？</a>
+    </div>
+    <p class="hero-note">買い切り ／ 永続利用 ／ アップデート無料 ／ リスクゼロで練習できる</p>
+    <p class="hero-note" style="margin-top:8px; color:var(--text2);">※ 株価データは別途 J-Quants（一部無料。長期データについては有料）より取得が必要です</p>
+
+    <!-- App Screenshot -->
+    <div class="hero-chart">
+      <img src="app-screenshot.png" alt="株トレシミュレーター 画面イメージ"
+           style="width:100%; display:block; border-radius:0 0 12px 12px;">
+    </div>
+  </div>
+</section>
+
+<!-- R > G -->
+<section style="padding:80px 20px; background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div style="max-width:860px; margin:0 auto;">
+
+    <!-- 上部ラベル -->
+    <div style="font-size:12px; font-weight:700; letter-spacing:0.14em; color:var(--accent); margin-bottom:24px; text-align:center; text-transform:uppercase;">経済学的根拠</div>
+
+    <!-- 数式 + メッセージ -->
+    <div style="text-align:center; margin-bottom:40px;">
+      <div style="font-size:clamp(52px,10vw,96px); font-weight:900; line-height:1; letter-spacing:-0.02em; font-family:'Georgia',serif;">
+        <span style="color:var(--accent)">r</span>
+        <span style="color:var(--text2); font-size:0.6em; margin:0 8px;">&gt;</span>
+        <span style="color:var(--text)">g</span>
+      </div>
+      <div style="font-size:16px; color:var(--text2); margin-top:14px; letter-spacing:0.04em;">
+        資本収益率（r）　＞　経済成長率・賃金上昇率（g）
+      </div>
+    </div>
+
+    <!-- 2カラム：指標カード -->
+    <div class="rg-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:560px; margin:0 auto 40px;">
+      <div style="background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:24px; text-align:center;">
+        <div style="font-size:13px; color:var(--accent); font-weight:700; letter-spacing:0.08em; margin-bottom:8px;">資本収益率 r</div>
+        <div style="font-size:clamp(28px,5vw,40px); font-weight:900; color:var(--accent); line-height:1;">約 4〜5<span style="font-size:0.5em">%/年</span></div>
+        <div style="font-size:13px; color:var(--text2); margin-top:6px;">株式・不動産などの投資</div>
+      </div>
+      <div style="background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:24px; text-align:center;">
+        <div style="font-size:13px; color:var(--text2); font-weight:700; letter-spacing:0.08em; margin-bottom:8px;">経済成長率 g</div>
+        <div style="font-size:clamp(28px,5vw,40px); font-weight:900; color:var(--text2); line-height:1;">約 1〜2<span style="font-size:0.5em">%/年</span></div>
+        <div style="font-size:13px; color:var(--text2); margin-top:6px;">給与・賃金の上昇</div>
+      </div>
+    </div>
+
+    <!-- 結論メッセージ -->
+    <div style="text-align:center; max-width:640px; margin:0 auto 32px;">
+      <p style="font-size:clamp(18px,3vw,24px); font-weight:800; line-height:1.6; margin-bottom:16px;">
+        「一生懸命働いて給料を上げる」より、<br>
+        <span style="color:var(--accent)">「お金に働いてもらう」ほうが、数学的に有利。</span>
+      </p>
+      <p style="font-size:16px; color:var(--text2); line-height:1.9;">
+        過去200年以上の世界的なデータが示すこの事実を、子どもが若いうちから体感として理解できるかどうか——
+        それが将来の資産形成に決定的な差をもたらします。
+      </p>
+    </div>
+
+    <!-- 引用 -->
+    <div style="max-width:640px; margin:0 auto; background:var(--bg); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:8px; padding:16px 20px;">
+      <div style="font-size:13px; color:var(--text2); line-height:1.7;">
+        Piketty, T. (2014). <em>Capital in the Twenty-First Century</em>. Harvard University Press.<br>
+        <span style="opacity:0.7;">（原著：Le Capital au XXIe siècle, Éditions du Seuil, 2013）</span><br>
+        200年以上・20カ国以上の所得・資産データを分析。資本収益率 r は歴史的に経済成長率 g を恒常的に上回り、
+        <strong style="color:var(--text)">r &gt; g の不等式が富の格差拡大の主因</strong>であることを実証した。
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section style="padding:72px 20px; text-align:center; background:var(--bg); border-top:1px solid var(--border);">
+  <div style="max-width:760px; margin:0 auto;">
+    <p style="font-size:clamp(22px,4vw,38px); font-weight:900; line-height:1.5; letter-spacing:-0.01em;">
+      トレード練習で<span style="color:var(--red)">負ける悔しさ</span>が、<br>
+      <span style="color:var(--accent)">本当の投資力</span>を育てる。
+    </p>
+    <div style="width:48px; height:3px; background:var(--accent); margin:28px auto;"></div>
+    <p style="font-size:17px; color:var(--text2); line-height:1.9; max-width:580px; margin:0 auto;">
+      「なぜ損切りできなかったのか」「なぜ利益をすぐ取ってしまったのか」——
+      仮想資金で何度も悔しい思いをするからこそ、本物の相場で冷静に判断できるようになる。
+      失敗はデータ。繰り返すことが、唯一の近道です。
+    </p>
+  </div>
+</section>
+
+<!-- GAMIFICATION EVIDENCE -->
+<section style="padding:60px 20px; background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="section-inner">
+    <div class="section-label">科学的根拠</div>
+    <h2 class="section-title" style="margin-bottom:8px;">「負けて学ぶ」は<br>科学で証明されている</h2>
+    <p style="color:var(--text2); font-size:14px; line-height:1.8; max-width:600px; margin-bottom:36px;">
+      感情を動かす失敗体験が深い理解を生む——これは感覚論ではなく、複数の査読論文が裏付けるエビデンスです。
+    </p>
+
+    <div class="evidence-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px;">
+
+      <!-- 論文1: Productive Failure -->
+      <div style="background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:24px; border-top:3px solid var(--accent);">
+        <div style="font-size:12px; font-weight:700; letter-spacing:0.08em; color:var(--accent); margin-bottom:12px;">📄 メタ分析 53研究・166比較</div>
+        <div style="font-weight:800; font-size:15px; margin-bottom:10px; line-height:1.4;">
+          先に失敗してから学ぶと<br>概念理解が大幅に向上
+        </div>
+        <div style="font-size:14px; color:var(--text2); line-height:1.8; margin-bottom:14px;">
+          「まず問題に挑戦→その後に解説」という順序は、「解説を先に受ける」従来型と比べて
+          <strong style="color:var(--text)">概念的理解と応用力で有意に高い効果量（g = 0.36〜0.58）</strong>を示した。
+          失敗体験が脳の準備状態を高め、その後の学習を加速させる。
+        </div>
+        <div style="font-size:12px; color:var(--text2); opacity:0.85; line-height:1.7;">
+          Sinha, T., &amp; Kapur, M. (2021). When Problem Solving Followed by Instruction Works: Evidence for Productive Failure.
+          <em>Review of Educational Research</em>, 91(5), 761–798.
+          DOI: 10.3102/00346543211019105
+        </div>
+      </div>
+
+      <!-- 論文2: Game Failure -->
+      <div style="background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:24px; border-top:3px solid var(--blue);">
+        <div style="font-size:12px; font-weight:700; letter-spacing:0.08em; color:var(--blue); margin-bottom:12px;">📄 実験研究 88名・中学生対象</div>
+        <div style="font-weight:800; font-size:15px; margin-bottom:10px; line-height:1.4;">
+          ゲームで失敗した回数が多いほど<br>その後の学習成果が高い
+        </div>
+        <div style="font-size:14px; color:var(--text2); line-height:1.8; margin-bottom:14px;">
+          教育ゲームで成功するまでの失敗回数を計測したところ、
+          <strong style="color:var(--text)">失敗回数が多いほどその後の学習成果が高く</strong>、
+          プレイ時間よりも強い予測因子であることが判明。
+          失敗後に自発的な学習討議が生まれることも確認された。
+        </div>
+        <div style="font-size:12px; color:var(--text2); opacity:0.85; line-height:1.7;">
+          Anderson, C. G., et al. (2018). Failing up: How Failure in a Game Environment Promotes Learning Through Discourse.
+          <em>Thinking Skills and Creativity</em>, 30, 135–144.
+          DOI: 10.1016/j.tsc.2018.03.002
+        </div>
+      </div>
+
+      <!-- 論文3: Gamification -->
+      <div style="background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:24px; border-top:3px solid var(--green);">
+        <div style="font-size:12px; font-weight:700; letter-spacing:0.08em; color:var(--green); margin-bottom:12px;">📄 メタ分析 N=1,686</div>
+        <div style="font-weight:800; font-size:15px; margin-bottom:10px; line-height:1.4;">
+          ゲーミフィケーションが<br>認知的学習成果を有意に向上
+        </div>
+        <div style="font-size:14px; color:var(--text2); line-height:1.8; margin-bottom:14px;">
+          19の研究・1,686名を対象にしたメタ分析で、ゲーミフィケーションは
+          <strong style="color:var(--text)">認知的学習成果に中程度の正の効果（効果量 g = 0.49）</strong>をもたらすことが確認された。
+          動機づけ・行動変容への効果も有意に示された。
+        </div>
+        <div style="font-size:12px; color:var(--text2); opacity:0.85; line-height:1.7;">
+          Sailer, M., &amp; Homner, L. (2020). The Gamification of Learning: A Meta-Analysis.
+          <em>Educational Psychology Review</em>, 32, 77–112.
+          DOI: 10.1007/s10648-019-09498-w
+        </div>
+      </div>
+
+      <!-- 論文4: Financial Game -->
+      <div style="background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:24px; border-top:3px solid var(--accent);">
+        <div style="font-size:12px; font-weight:700; letter-spacing:0.08em; color:var(--accent); margin-bottom:12px;">📄 実証研究 640名・42校</div>
+        <div style="font-weight:800; font-size:15px; margin-bottom:10px; line-height:1.4;">
+          金融シミュレーションゲームで<br>知識習得効果が頑強に確認
+        </div>
+        <div style="font-size:14px; color:var(--text2); line-height:1.8; margin-bottom:14px;">
+          640名の中学生を対象に、ゲームベース金融教育の効果を事前・事後調査で測定。
+          <strong style="color:var(--text)">知識習得への効果は統計的に頑強（ロバスト）に確認</strong>され、
+          特に多様な学習目標を持つチーム型ゲームで最も大きな効果が得られた。
+        </div>
+        <div style="font-size:12px; color:var(--text2); opacity:0.85; line-height:1.7;">
+          Kalmi, P., &amp; Rahko, J. (2022). The Effects of Game-Based Financial Education.
+          <em>The Journal of Economic Education</em>, 53(2).
+          DOI: 10.1080/00220485.2022.2038320
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM（親の悩み） -->
+<section class="problem">
+  <div class="section-inner">
+    <div class="section-label">親御さんのお悩み</div>
+    <h2 class="section-title">「お金の教育、<br>何から始めればいいかわからない」</h2>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <h3>学校では教えてくれない</h3>
+        <p>2022年から高校で「資産形成」が必修化されたが、実践的な練習の機会は授業だけでは圧倒的に不足している。</p>
+      </div>
+      <div class="problem-card">
+        <h3>実際のお金を渡すのは怖い</h3>
+        <p>「投資を体験させたい」と思っても、子どもに本物の資金を渡して損させるわけにはいかない。</p>
+      </div>
+      <div class="problem-card">
+        <h3>ゲームで時間を無駄にしてほしくない</h3>
+        <p>ゲームに費やす時間を、将来につながる経験に変えたい。でも、子どもが自発的に興味を持てる形でなければ続かない。</p>
+      </div>
+      <div class="problem-card">
+        <h3>本や動画を読んでくれない</h3>
+        <p>「投資の本を読みなさい」と言っても興味を持ってくれない。体を動かして体験できる形でないと身につかない。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KIDS EDUCATION（メインセクション） -->
+<section style="background:linear-gradient(135deg, rgba(245,158,11,0.06) 0%, rgba(99,102,241,0.04) 100%); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="section-inner">
+    <div class="kids-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center;">
+      <div>
+        <div class="section-label">子どもへの最高の贈り物</div>
+        <h2 class="section-title" style="margin-bottom:20px">「お金を育てる力」を<br>ゲーム感覚で学べる</h2>
+        <p style="color:var(--text2); font-size:15px; line-height:1.9; margin-bottom:28px">
+          2022年から高校で「金融教育」が必修化されました。しかし知識を覚えるだけでは、本当のお金の感覚は育ちません。<br><br>
+          株トレシミュレーターなら、<strong style="color:var(--text)">実際のお金を使わずに</strong>株式投資の仕組みを体験できます。
+          チャートの読み方・売買のタイミング・損切りの大切さを、失敗を恐れずに何度でも試せます。
+          <strong style="color:var(--accent)">悔しさを感じながら繰り返す</strong>ことで、本物の判断力が育ちます。
+        </p>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <span style="font-size:22px; flex-shrink:0">📖</span>
+            <div>
+              <div style="font-weight:700; font-size:14px; margin-bottom:3px">高校の授業の予習・復習に</div>
+              <div style="font-size:13px; color:var(--text2)">金融リテラシー教育の実践ツールとして。教科書の知識を「体験」に変える。</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <span style="font-size:22px; flex-shrink:0">👨‍👩‍👧</span>
+            <div>
+              <div style="font-weight:700; font-size:14px; margin-bottom:3px">親子で一緒に楽しめる</div>
+              <div style="font-size:13px; color:var(--text2)">「この会社知ってる？」と話しながらチャートを読む。お金の会話が自然に生まれる。</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <span style="font-size:22px; flex-shrink:0">🎮</span>
+            <div>
+              <div style="font-weight:700; font-size:14px; margin-bottom:3px">ゲーム感覚で自然に続けられる</div>
+              <div style="font-size:13px; color:var(--text2)">スペースキー1つで日が進む直感操作。「もう1回やりたい」と子どもが自分から触り続ける。</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <span style="font-size:22px; flex-shrink:0">🎓</span>
+            <div>
+              <div style="font-weight:700; font-size:14px; margin-bottom:3px">社会に出てから役立つ本物のスキル</div>
+              <div style="font-size:13px; color:var(--text2)">チャートの読み方・リスク管理・自分の心理パターンの把握——仕事や生活に直結する思考力が育つ。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:32px; text-align:center;">
+          <div style="font-size:52px; margin-bottom:16px">📚</div>
+          <div style="font-size:13px; font-weight:700; color:var(--accent); letter-spacing:0.08em; margin-bottom:12px">2022年 高校必修化</div>
+          <div style="font-size:20px; font-weight:800; margin-bottom:16px; line-height:1.4">「資産形成」が<br>学習指導要領に追加</div>
+          <div style="font-size:13px; color:var(--text2); line-height:1.8; margin-bottom:24px">
+            知識を教わるだけでなく、<br>「体で覚える」実践の場が必要です。
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="background:var(--bg3); border-radius:8px; padding:12px 16px; font-size:13px; text-align:left;">
+              <span style="color:var(--green); font-weight:700">✓</span> 実際のお金を失わないから安心して学べる
+            </div>
+            <div style="background:var(--bg3); border-radius:8px; padding:12px 16px; font-size:13px; text-align:left;">
+              <span style="color:var(--green); font-weight:700">✓</span> 何度失敗しても繰り返し練習できる
+            </div>
+            <div style="background:var(--bg3); border-radius:8px; padding:12px 16px; font-size:13px; text-align:left;">
+              <span style="color:var(--green); font-weight:700">✓</span> 実際の企業・株価で現実感を体験
+            </div>
+            <div style="background:var(--bg3); border-radius:8px; padding:12px 16px; font-size:13px; text-align:left;">
+              <span style="color:var(--green); font-weight:700">✓</span> 親子で一緒に画面を見て話せる
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">本番さながらの環境で<br>繰り返し失敗して学べる</h2>
+    <p class="section-desc">
+      実際の日本株価データを使い、お金を失わずにトレードを体験。
+      自分の取引を記録・分析して、勝ちパターンと負けパターンを発見できます。
+    </p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-card-num">01</div>
+        <h3>実際の株価データで練習</h3>
+        <p>日本株の実際のOHLCV（始値・高値・安値・終値・出来高）データを使用。「トヨタって株価どうやって動くの？」という会話が生まれます。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-num">02</div>
+        <h3>3ラウンドモード</h3>
+        <p>同じ銘柄を時期をずらして3回トレード。自分のパターンがどんな局面でも通用するか、繰り返し検証できます。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-num">03</div>
+        <h3>日足・週足・月足チャート</h3>
+        <p>タブ切替で時間足を変更。大局観を週足・月足で確認しながら、日足でエントリーを判断するトレードができます。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-num">04</div>
+        <h3>リベンジトレード検知</h3>
+        <p>損失直後の衝動的エントリーを自動で検出。「感情に流された」トレードのパターンを数値で振り返れます。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-num">05</div>
+        <h3>リスク管理計算</h3>
+        <p>損切り幅・リスク率から最適な株数を自動計算。「何株買うか」というポジションサイジングの感覚を身体で覚えられます。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-num">06</div>
+        <h3>トレード分析レポート</h3>
+        <p>勝率・平均損益・ホールド日数など多角的に分析。自分の強みと弱みが一目でわかります。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-inner">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">使い方はシンプル<br>中学生から一人で始められる</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>銘柄を選ぶ</h3>
+        <p>ランダム選択または銘柄コードで指定。「この会社で練習しよう」と親子で選んでも楽しい。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>翌日へ進める</h3>
+        <p>スペースキー1つで1日進む。チャートを見ながら買い・売りのタイミングを判断する。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>トレードする</h3>
+        <p>買い・空売り・決済。リスク管理計算で株数を決めてエントリー。失敗しても仮想資金だから大丈夫。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>結果を振り返る</h3>
+        <p>損益グラフ・イベント分析で自分の癖を把握。「なぜ失敗したか」を考える習慣が身につく。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TARGET（こんな親御さんへ） -->
+<section>
+  <div class="section-inner">
+    <div class="section-label">こんな親御さんへ</div>
+    <h2 class="section-title">子どもの将来のために、<br>今できることを探している方へ</h2>
+    <p class="section-desc">投資の知識は、社会に出てから一生使えるスキルです。</p>
+    <div class="target-list">
+      <div class="target-item">
+        <span class="target-check">✓</span>
+        <p>子どもにお金の大切さをゲーム感覚で教えたい</p>
+      </div>
+      <div class="target-item">
+        <span class="target-check">✓</span>
+        <p>高校の金融教育の予習・復習をさせたい</p>
+      </div>
+      <div class="target-item">
+        <span class="target-check">✓</span>
+        <p>認知能力がピークの今のうちに投資感覚を身につけさせたい</p>
+      </div>
+      <div class="target-item">
+        <span class="target-check">✓</span>
+        <p>実際のお金を渡さずに安全に投資を体験させたい</p>
+      </div>
+      <div class="target-item">
+        <span class="target-check">✓</span>
+        <p>お金や株の話を親子で自然にできるようにしたい</p>
+      </div>
+      <div class="target-item">
+        <span class="target-check">✓</span>
+        <p>ゲームに使う時間を、将来に役立つ体験に変えたい</p>
+      </div>
+      <div class="target-item">
+        <span class="target-check">✓</span>
+        <p>社会人になった子ども・孫に投資の基礎を贈りたい</p>
+      </div>
+      <div class="target-item">
+        <span class="target-check">✓</span>
+        <p>自分自身も株の練習をしたい（親子で一緒に使いたい）</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="section-inner">
+    <div class="stats-grid">
+      <div>
+        <div class="stat-num">1,000<span style="font-size:0.5em">銘柄以上</span></div>
+        <div class="stat-label">対応銘柄数（日本株）</div>
+      </div>
+      <div>
+        <div class="stat-num">20<span style="font-size:0.5em">年超</span></div>
+        <div class="stat-label">利用可能な株価データ期間</div>
+      </div>
+      <div>
+        <div class="stat-num">3<span style="font-size:0.5em">種類</span></div>
+        <div class="stat-label">時間足（日足・週足・月足）</div>
+      </div>
+      <div>
+        <div class="stat-num">∞</div>
+        <div class="stat-label">練習回数（制限なし）</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AGE SECTION -->
+<section style="background:var(--bg); border-top:1px solid var(--border); padding:80px 20px;">
+  <div class="section-inner">
+    <div class="section-label">認知科学からみた学習タイミング</div>
+    <h2 class="section-title">投資に必要な認知能力は<br>10代後半〜20代前半がピーク</h2>
+    <p style="color:var(--text2); font-size:15px; line-height:1.9; max-width:620px; margin-bottom:32px;">
+      投資判断には、チャートを素早く読む<strong style="color:var(--text)">情報処理速度</strong>と、
+      複数の情報を同時に保持する<strong style="color:var(--text)">作業記憶</strong>が不可欠です。
+      学術研究によると、これらの認知能力は<strong style="color:var(--accent)">10代後半〜20歳前後にピーク</strong>を迎え、
+      その後は緩やかに低下していきます。
+      <strong style="color:var(--text)">今が、最も習得コストが低いタイミングです。</strong>
+    </p>
+
+    <!-- 学術的根拠 -->
+    <div style="background:var(--bg2); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; padding:28px 32px; margin-bottom:48px;">
+      <div style="font-size:13px; font-weight:700; letter-spacing:0.1em; color:var(--accent); margin-bottom:20px;">📄 学術的根拠</div>
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div>
+          <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:var(--text)">
+            作業記憶は20歳でピーク、その後直線的に低下
+          </div>
+          <div style="font-size:14px; color:var(--text2); line-height:1.8;">
+            55,753名（8〜75歳）を対象にした大規模研究により、視覚的作業記憶の容量は<strong style="color:var(--text)">20歳前後でピーク</strong>に達し、
+            その後は成人期を通じて直線的に低下することが実証されました。
+          </div>
+          <div style="font-size:12px; color:var(--text2); margin-top:8px; opacity:0.8; line-height:1.6;">
+            Brockmole, J. R., &amp; Logie, R. H. (2013). Age-Related Change in Visual Working Memory.
+            <em>Frontiers in Psychology</em>. DOI: 10.3389/fpsyg.2013.00012
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border); padding-top:20px;">
+          <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:var(--text)">
+            情報処理速度は10代後半がピーク
+          </div>
+          <div style="font-size:14px; color:var(--text2); line-height:1.8;">
+            48,537名のデータ分析により、処理速度・情報検索速度は<strong style="color:var(--text)">10代後半〜高校卒業頃にピーク</strong>を迎え、
+            その後低下が始まることが判明。認知能力は一斉に衰えるのではなく、
+            種類によってピーク時期が異なることも明らかになっています。
+          </div>
+          <div style="font-size:12px; color:var(--text2); margin-top:8px; opacity:0.8; line-height:1.6;">
+            Hartshorne, J. K., &amp; Germine, L. T. (2015). When Does Cognitive Functioning Peak?
+            <em>Psychological Science</em>, 26(4), 433–443. DOI: 10.1177/0956797614567339
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border); padding-top:20px;">
+          <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:var(--text)">
+            スキルの習得速度・自動化は若年者が有意に速い
+          </div>
+          <div style="font-size:14px; color:var(--text2); line-height:1.8;">
+            スキル習得実験において、若年者は高齢者より<strong style="color:var(--text)">計算から直感（自動化）への移行速度が大幅に速く</strong>、
+            速度優先・正確性優先のどちらの条件でも若年者の習得スピードが上回ることが実証されています。
+          </div>
+          <div style="font-size:12px; color:var(--text2); margin-top:8px; opacity:0.8; line-height:1.6;">
+            Touron, D. R., Hoyer, W. J., &amp; Cerella, J. (2004). Cognitive Skill Learning: Age-Related Differences.
+            <em>Psychology and Aging</em>, 19(4), 565–580. DOI: 10.1037/0882-7974.19.4.565
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 認知能力カーブ（グラフ風） -->
+    <div style="background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:32px; margin-bottom:40px;">
+      <div style="font-size:12px; font-weight:700; color:var(--text2); margin-bottom:20px; letter-spacing:0.06em;">認知能力の年齢別推移（模式図）</div>
+
+      <!-- 情報処理速度バー -->
+      <div style="margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text2); margin-bottom:6px;">
+          <span style="font-weight:700; color:var(--text)">情報処理速度</span>
+          <span style="color:var(--accent); font-weight:700;">ピーク：10代後半 ★</span>
+        </div>
+        <div style="position:relative; height:24px; border-radius:6px; overflow:hidden; background:var(--bg3);">
+          <div style="position:absolute; left:0; top:0; width:28%; height:100%; background:linear-gradient(90deg,rgba(245,158,11,0.15),rgba(245,158,11,0.5)); border-right:2px solid var(--accent);"></div>
+          <div style="position:absolute; left:28%; top:0; width:72%; height:100%; background:linear-gradient(90deg,rgba(245,158,11,0.12),rgba(239,68,68,0.08));"></div>
+          <div class="peak-label" style="position:absolute; left:26%; top:50%; transform:translateY(-50%); font-size:10px; font-weight:800; color:var(--accent);">▼ 18歳前後</div>
+        </div>
+      </div>
+
+      <!-- 作業記憶バー -->
+      <div style="margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text2); margin-bottom:6px;">
+          <span style="font-weight:700; color:var(--text)">作業記憶（ワーキングメモリ）</span>
+          <span style="color:var(--accent); font-weight:700;">ピーク：20歳前後 ★</span>
+        </div>
+        <div style="position:relative; height:24px; border-radius:6px; overflow:hidden; background:var(--bg3);">
+          <div style="position:absolute; left:0; top:0; width:33%; height:100%; background:linear-gradient(90deg,rgba(99,102,241,0.15),rgba(99,102,241,0.5)); border-right:2px solid var(--blue);"></div>
+          <div style="position:absolute; left:33%; top:0; width:67%; height:100%; background:linear-gradient(90deg,rgba(99,102,241,0.12),rgba(239,68,68,0.08));"></div>
+          <div class="peak-label" style="position:absolute; left:31%; top:50%; transform:translateY(-50%); font-size:10px; font-weight:800; color:var(--blue);">▼ 20歳前後</div>
+        </div>
+      </div>
+
+      <!-- X軸ラベル -->
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text2); padding:0 2px; margin-top:8px;">
+        <span>10歳</span><span>20歳</span><span>30歳</span><span>40歳</span><span>50歳</span><span>60歳以上</span>
+      </div>
+      <div style="margin-top:12px; font-size:11px; color:var(--text2); line-height:1.6;">
+        出典：Hartshorne &amp; Germine (2015) <em>Psychological Science</em> / Brockmole &amp; Logie (2013) <em>Frontiers in Psychology</em><br>
+        ※ 能力によってピーク時期は異なります。語彙・結晶性知識は60代まで高水準を維持します。
+      </div>
+    </div>
+
+    <!-- 3カラム -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px;">
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:24px; border-top:3px solid var(--accent);">
+        <div style="font-size:28px; margin-bottom:12px;">🎓</div>
+        <div style="font-weight:800; font-size:15px; margin-bottom:8px;">中高生（13〜18歳）</div>
+        <div style="font-size:13px; color:var(--text2); line-height:1.7;">
+          情報処理速度がピークに向かう時期。チャートを直感的に読む感覚を最も効率よく身につけられる。
+          高校の金融教育の実践練習としても最適。
+        </div>
+      </div>
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:24px; border-top:3px solid var(--blue);">
+        <div style="font-size:28px; margin-bottom:12px;">🏫</div>
+        <div style="font-weight:800; font-size:15px; margin-bottom:8px;">大学生・20代（19〜29歳）</div>
+        <div style="font-size:13px; color:var(--text2); line-height:1.7;">
+          作業記憶がピーク付近にあり、複雑な投資判断の訓練に最適な時期。
+          失敗を重ねて習慣を作る土台を、この時期に形成しておくことが重要。
+        </div>
+      </div>
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:24px; border-top:3px solid var(--red);">
+        <div style="font-size:28px; margin-bottom:12px;">⏰</div>
+        <div style="font-weight:800; font-size:15px; margin-bottom:8px;">今すぐ始めることが大切</div>
+        <div style="font-size:13px; color:var(--text2); line-height:1.7;">
+          認知能力のピークは一度きり。「もう少し大きくなってから」は遅くなるだけです。
+          <strong style="color:var(--text)">「気づいたとき」が最も早いタイミング。</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" style="background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="section-inner" style="text-align:center">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">子どもへの一生モノの贈り物</h2>
+    <p class="section-desc" style="margin: 0 auto 40px">月額なし・買い切り・永続利用。一度購入すれば、ずっと使い続けられます。</p>
+
+    <!-- コスト比較 -->
+    <div style="max-width:600px; margin:0 auto 40px; background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:24px 28px; text-align:left;">
+      <div style="font-size:12px; font-weight:700; color:var(--text2); letter-spacing:0.08em; margin-bottom:16px;">他の習い事・教育費との比較</div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="price-compare-row" style="display:flex; justify-content:space-between; align-items:center; font-size:14px;">
+          <span style="color:var(--text2)">塾（月謝）</span>
+          <span class="price-compare-value" style="color:var(--text); font-weight:700;">¥20,000〜50,000 ／ 月</span>
+        </div>
+        <div class="price-compare-row" style="display:flex; justify-content:space-between; align-items:center; font-size:14px;">
+          <span style="color:var(--text2)">英会話スクール（月謝）</span>
+          <span class="price-compare-value" style="color:var(--text); font-weight:700;">¥10,000〜30,000 ／ 月</span>
+        </div>
+        <div class="price-compare-row" style="display:flex; justify-content:space-between; align-items:center; font-size:14px;">
+          <span style="color:var(--text2)">ピアノ・習い事（月謝）</span>
+          <span class="price-compare-value" style="color:var(--text); font-weight:700;">¥8,000〜20,000 ／ 月</span>
+        </div>
+        <div class="price-compare-row" style="border-top:1px solid var(--border); padding-top:12px; display:flex; justify-content:space-between; align-items:center; font-size:15px;">
+          <span style="color:var(--accent); font-weight:800;">株トレシミュレーター</span>
+          <span class="price-compare-value" style="color:var(--accent); font-weight:900;">¥24,800 ／ 買い切り永続</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-head">
+        <div class="pricing-badge">買い切り / 永続ライセンス</div>
+        <div class="pricing-name">株トレシミュレーター</div>
+        <div class="pricing-price"><span>¥</span>24,800<span style="font-size:16px;color:var(--text2)">（税込）</span></div>
+        <div class="pricing-note">1ライセンス = 1台のPC で利用可能（家族で共有OK）</div>
+      </div>
+      <div class="pricing-body">
+        <ul class="pricing-features">
+          <li>日本株 1,000銘柄以上に対応</li>
+          <li>日足・週足・月足チャート表示</li>
+          <li>3ラウンドモード（同銘柄で反復練習）</li>
+          <li>リベンジトレード自動検知</li>
+          <li>リスク管理計算機能</li>
+          <li>損益グラフ・トレード分析レポート</li>
+          <li>ブラインドモード（銘柄名を隠して練習）</li>
+          <li>永続ライセンス・アップデート無料</li>
+        </ul>
+        <a href="#" class="pricing-cta" id="purchaseBtn">購入してダウンロードする</a>
+        <p class="pricing-guarantee">
+          🔒 Stripe による安全な決済 ／ 購入後すぐにダウンロード可能
+        </p>
+        <div style="margin-top:16px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:14px 16px; font-size:14px; color:var(--text2); line-height:1.7; text-align:left;">
+          <strong style="color:var(--text);">⚠️ 株価データについて</strong><br>
+          本アプリの利用には株価データが別途必要です。アプリ内の管理画面から
+          <strong style="color:var(--text)">J-Quants</strong>経由で取得できます（一部無料。長期データについては有料）。
+          CSV形式のデータ取り込みにも対応しています。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="section-inner">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title">よくある質問</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">何歳から使えますか？</div>
+        <div class="faq-a">中学生（13歳前後）から一人で楽しめる設計です。小学生高学年でも、親御さんと一緒であれば使えます。チャートを見ながら「なぜ上がったか・下がったか」を話し合う親子時間としてもご活用ください。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">子どもが一人で使いこなせますか？</div>
+        <div class="faq-a">はい。スペースキー1つで翌日に進む直感的な操作で、難しい設定は不要です。最初は「銘柄を選んでスペースを押す」だけで始められます。分析機能は慣れてから少しずつ活用できます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">動作環境を教えてください。</div>
+        <div class="faq-a">Windows 10 / 11（64bit）に対応しています。Mac・スマートフォンには現在対応していません。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">購入後はすぐに使えますか？</div>
+        <div class="faq-a">決済完了後、ご登録のメールアドレスにダウンロードリンクとライセンスキーをお送りします。数分以内にご利用いただけます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">株価データはどのように入手しますか？</div>
+        <div class="faq-a">アプリ内の管理画面からJ-Quantsを通じて取得できます。無料アカウント登録で利用可能です。また、CSV形式の株価データの取り込みにも対応しています。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">1ライセンスで家族全員が使えますか？</div>
+        <div class="faq-a">1ライセンスにつき1台のPCでご利用いただけます。同じPCで家族が使う分には問題ありません。複数台でご利用の場合は台数分のライセンスが必要です。PCを買い替えた際は移行申請（無料）が可能です。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">アップデートは有料ですか？</div>
+        <div class="faq-a">購入後のアップデートはすべて無料です。新機能追加・不具合修正も継続的に提供します。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">返金はできますか？</div>
+        <div class="faq-a">ダウンロード型ソフトウェアの性質上、原則として返金はお受けできません。購入前にご不明な点はお問い合わせください。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <h2>お子さんの将来に、<br><span style="color:var(--accent)">一生使えるお金の感覚</span>を贈る。</h2>
+  <p>認知能力のピークは今だけ。学校では教えてくれない「投資の体験」を、今。</p>
+  <a href="#pricing" class="btn-primary">購入する — ¥24,800（買い切り）</a>
+  <p style="margin-top:16px; font-size:13px; color:var(--text2)">ご質問は <a href="mailto:contact@example.com">こちらからお問い合わせ</a> ください</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>© 2026 株トレシミュレーター</div>
+  <div style="display:flex; gap:20px">
+    <a href="#">特定商取引法に基づく表記</a>
+    <a href="#">プライバシーポリシー</a>
+    <a href="mailto:contact@example.com">お問い合わせ</a>
+  </div>
+</footer>
+
+
+</body>
+</html>
