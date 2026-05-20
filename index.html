@@ -923,7 +923,41 @@
       </div>
       <div class="faq-item">
         <div class="faq-q">株価データはどのように入手しますか？</div>
-        <div class="faq-a">アプリ内の管理画面からJ-Quantsを通じて取得できます。無料アカウント登録で利用可能です。また、CSV形式の株価データの取り込みにも対応しています。</div>
+        <div class="faq-a"><div style="flex:1; min-width:0;">
+          アプリ内の管理画面からJ-Quants（JPX公式API）を通じて取得できます。アカウント登録で利用可能で、プランによって取得できるデータ期間が異なります。また、CSV形式の株価データの取り込みにも対応しています。
+          <table style="margin-top:14px; width:100%; border-collapse:collapse; font-size:14px; background:var(--bg3); border-radius:8px; overflow:hidden;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border);">
+                <th style="text-align:left; padding:10px 14px; color:var(--text2); font-weight:600;">プラン</th>
+                <th style="text-align:center; padding:10px 14px; color:var(--text2); font-weight:600;">月額</th>
+                <th style="text-align:left; padding:10px 14px; color:var(--text2); font-weight:600;">取得できるデータ期間</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:10px 14px; font-weight:700; color:var(--text);">無料</td>
+                <td style="padding:10px 14px; text-align:center; color:var(--text2);">¥0</td>
+                <td style="padding:10px 14px; color:var(--text2);">直近12週間</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:10px 14px; font-weight:700; color:var(--text);">Light</td>
+                <td style="padding:10px 14px; text-align:center; color:var(--text2);">¥1,650</td>
+                <td style="padding:10px 14px; color:var(--text2);">約2年</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:10px 14px; font-weight:700; color:var(--accent);">Standard</td>
+                <td style="padding:10px 14px; text-align:center; color:var(--text2);">¥3,300</td>
+                <td style="padding:10px 14px; color:var(--text2);">約5年</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 14px; font-weight:700; color:var(--text);">Premium</td>
+                <td style="padding:10px 14px; text-align:center; color:var(--text2);">¥16,500</td>
+                <td style="padding:10px 14px; color:var(--text2);">2008年5月〜全期間</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="margin-top:10px; font-size:12px; color:var(--text2);">※ 練習目的には無料〜Lightプランで十分です。長期チャートで検証したい場合はStandard以上をお勧めします。</div>
+        </div></div>
       </div>
       <div class="faq-item">
         <div class="faq-q">1ライセンスで家族全員が使えますか？</div>
