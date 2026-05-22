@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>サポート | 株トレシミュレーター</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#0a0e1a; --bg2:#111827; --bg3:#1a2236;
+      --border:#2a3550; --text:#e8eaf0; --text2:#8892a4;
+      --accent:#f59e0b; --green:#10b981; --red:#ef4444;
+    }
+    body { background:var(--bg); color:var(--text); font-family:'Helvetica Neue',Arial,'Hiragino Kaku Gothic ProN',sans-serif; line-height:1.8; }
+    nav {
+      position:sticky; top:0; z-index:100;
+      background:rgba(10,14,26,0.92); backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);
+      padding:0 24px; height:56px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .nav-logo { font-size:14px; font-weight:800; color:var(--text); text-decoration:none; }
+    .nav-back  { font-size:13px; color:var(--text2); text-decoration:none; }
+    .nav-back:hover { color:var(--text); }
+    main { max-width:640px; margin:0 auto; padding:60px 24px 80px; }
+    h1 { font-size:24px; font-weight:800; margin-bottom:8px; }
+    .subtitle { font-size:13px; color:var(--text2); margin-bottom:48px; }
+    .card {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:14px; padding:32px; margin-bottom:24px;
+    }
+    .card h2 { font-size:17px; font-weight:700; margin-bottom:6px; }
+    .card p  { font-size:14px; color:var(--text2); line-height:1.8; margin-bottom:20px; }
+    label { display:block; font-size:13px; color:var(--text2); margin-bottom:6px; }
+    input, textarea {
+      width:100%; padding:10px 14px;
+      background:var(--bg3); border:1px solid var(--border);
+      border-radius:8px; color:var(--text); font-size:14px;
+      margin-bottom:16px;
+    }
+    input[type="text"] { font-family:monospace; letter-spacing:0.05em; }
+    textarea { resize:vertical; }
+    button[type="submit"] {
+      padding:12px 28px; background:var(--accent);
+      border:none; border-radius:8px; color:#000;
+      font-size:14px; font-weight:700; cursor:pointer;
+      transition:opacity 0.15s;
+    }
+    button[type="submit"]:hover { opacity:0.85; }
+    button[type="submit"]:disabled { opacity:0.5; cursor:not-allowed; }
+    .result-msg { font-size:13px; margin-top:12px; display:none; }
+    .result-ok  { color:var(--green); }
+    .result-err { color:var(--red); }
+    .contact-row { display:flex; align-items:center; gap:12px; }
+    .contact-row a { color:var(--accent); font-size:14px; }
+    footer {
+      border-top:1px solid var(--border); padding:32px 24px;
+      text-align:center; font-size:12px; color:var(--text2);
+    }
+    footer a { color:var(--text2); text-decoration:none; margin:0 12px; }
+    footer a:hover { color:var(--text); }
+    .req { color:var(--red); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">■ 株トレシミュレーター</a>
+  <a class="nav-back" href="index.html">← トップに戻る</a>
+</nav>
+
+<main>
+  <h1>サポート</h1>
+  <p class="subtitle">ご不明な点はこちらからご連絡ください。</p>
+
+  <!-- デバイス解除申請 -->
+  <div class="card">
+    <h2>PCを変更された方へ（デバイス解除申請）</h2>
+    <p>
+      新しいPCで株トレシミュレーターを使い始める場合は、デバイス解除申請が必要です。
+      購入時のメールアドレスとシリアルコードを入力して申請してください。
+      通常1〜2営業日以内に対応します。
+    </p>
+    <form id="unlockForm">
+      <label>シリアルコード <span class="req">*</span></label>
+      <input id="unlockSerial" type="text" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19" autocomplete="off">
+
+      <label>購入時のメールアドレス <span class="req">*</span></label>
+      <input id="unlockEmail" type="email" placeholder="example@email.com">
+
+      <label>申請理由（任意）</label>
+      <textarea id="unlockReason" placeholder="例：新しいPCを購入しました" rows="3"></textarea>
+
+      <button type="submit">デバイス解除を申請する</button>
+      <p id="unlockMsg" class="result-msg"></p>
+    </form>
+  </div>
+
+  <!-- お問い合わせ -->
+  <div class="card">
+    <h2>その他のお問い合わせ</h2>
+    <p>ご購入・動作・その他のご質問はメールにてお気軽にどうぞ。</p>
+    <div class="contact-row">
+      <a href="mailto:fukushino.youmade@gmail.com">fukushino.youmade@gmail.com</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div style="margin-bottom:12px;">
+    <a href="index.html">トップ</a>
+    <a href="tokusho.html">特定商取引法に基づく表記</a>
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="support.html">サポート</a>
+  </div>
+  <div>© 2026 福祉のユーメイド合同会社</div>
+</footer>
+
+<script>
+document.getElementById('unlockSerial').addEventListener('input', function() {
+  let v = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  let out = '';
+  for (let i = 0; i < v.length && i < 16; i++) {
+    if (i > 0 && i % 4 === 0) out += '-';
+    out += v[i];
+  }
+  this.value = out;
+});
+
+document.getElementById('unlockForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = this.querySelector('button[type=submit]');
+  const msg = document.getElementById('unlockMsg');
+  const serial = document.getElementById('unlockSerial').value.trim();
+  const email  = document.getElementById('unlockEmail').value.trim();
+  const reason = document.getElementById('unlockReason').value.trim();
+
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+  msg.style.display = 'none';
+
+  try {
+    const res = await fetch('https://license.your-domain.com/api/unlock-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ serial, email, reason })
+    });
+    const data = await res.json();
+    msg.style.display = 'block';
+    if (data.ok) {
+      msg.className = 'result-msg result-ok';
+      msg.textContent = '✓ ' + data.message;
+      this.reset();
+    } else {
+      msg.className = 'result-msg result-err';
+      msg.textContent = '✗ ' + data.message;
+    }
+  } catch {
+    msg.style.display = 'block';
+    msg.className = 'result-msg result-err';
+    msg.textContent = '✗ 通信エラーが発生しました。しばらくしてから再試行してください。';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'デバイス解除を申請する';
+  }
+});
+</script>
+</body>
+</html>

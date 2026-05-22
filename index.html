@@ -890,98 +890,13 @@
   <p style="margin-top:16px; font-size:13px; color:var(--text2)">ご質問は <a href="mailto:contact@example.com">こちらからお問い合わせ</a> ください</p>
 </section>
 
-<!-- DEVICE UNLOCK REQUEST -->
-<section id="device-unlock" style="background:var(--bg2); border-top:1px solid var(--border); padding:72px 20px;">
-  <div class="section-inner" style="max-width:600px;">
-    <div class="section-label">サポート</div>
-    <h2 class="section-title" style="margin-bottom:12px;">PCを変更された方へ</h2>
-    <p style="color:var(--text2); font-size:14px; line-height:1.8; margin-bottom:32px;">
-      新しいPCで株トレシミュレーターを使い始める場合は、デバイス解除申請が必要です。
-      購入時のメールアドレスとシリアルコードを入力して申請してください。通常1〜2営業日以内に対応します。
-    </p>
-    <form id="unlockForm" style="display:flex; flex-direction:column; gap:16px;">
-      <div>
-        <label style="display:block; font-size:13px; color:var(--text2); margin-bottom:6px;">シリアルコード <span style="color:var(--red)">*</span></label>
-        <input id="unlockSerial" type="text" placeholder="XXXX-XXXX-XXXX-XXXX"
-          style="width:100%; padding:10px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; font-family:monospace; letter-spacing:0.05em;"
-          maxlength="19">
-      </div>
-      <div>
-        <label style="display:block; font-size:13px; color:var(--text2); margin-bottom:6px;">購入時のメールアドレス <span style="color:var(--red)">*</span></label>
-        <input id="unlockEmail" type="email" placeholder="example@email.com"
-          style="width:100%; padding:10px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px;">
-      </div>
-      <div>
-        <label style="display:block; font-size:13px; color:var(--text2); margin-bottom:6px;">申請理由（任意）</label>
-        <textarea id="unlockReason" placeholder="例：新しいPCを購入しました" rows="3"
-          style="width:100%; padding:10px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; resize:vertical;"></textarea>
-      </div>
-      <div>
-        <button type="submit"
-          style="padding:12px 28px; background:var(--accent); border:none; border-radius:8px; color:#000; font-size:14px; font-weight:700; cursor:pointer; transition:opacity 0.15s;">
-          デバイス解除を申請する
-        </button>
-      </div>
-      <p id="unlockMsg" style="font-size:13px; display:none;"></p>
-    </form>
-  </div>
-</section>
-<script>
-document.getElementById('unlockSerial').addEventListener('input', function() {
-  let v = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-  let out = '';
-  for (let i = 0; i < v.length && i < 16; i++) {
-    if (i > 0 && i % 4 === 0) out += '-';
-    out += v[i];
-  }
-  this.value = out;
-});
-
-document.getElementById('unlockForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const btn = this.querySelector('button[type=submit]');
-  const msg = document.getElementById('unlockMsg');
-  const serial = document.getElementById('unlockSerial').value.trim();
-  const email  = document.getElementById('unlockEmail').value.trim();
-  const reason = document.getElementById('unlockReason').value.trim();
-
-  btn.disabled = true;
-  btn.textContent = '送信中...';
-  msg.style.display = 'none';
-
-  try {
-    const res = await fetch('https://license.your-domain.com/api/unlock-request', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ serial, email, reason })
-    });
-    const data = await res.json();
-    msg.style.display = 'block';
-    if (data.ok) {
-      msg.style.color = 'var(--green)';
-      msg.textContent = '✓ ' + data.message;
-      this.reset();
-    } else {
-      msg.style.color = 'var(--red)';
-      msg.textContent = '✗ ' + data.message;
-    }
-  } catch {
-    msg.style.display = 'block';
-    msg.style.color = 'var(--red)';
-    msg.textContent = '✗ 通信エラーが発生しました。しばらくしてから再試行してください。';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'デバイス解除を申請する';
-  }
-});
-</script>
-
 <!-- FOOTER -->
 <footer>
   <div>© 2026 株トレシミュレーター</div>
   <div style="display:flex; gap:20px">
     <a href="tokusho.html">特定商取引法に基づく表記</a>
     <a href="privacy.html">プライバシーポリシー</a>
+    <a href="support.html">サポート</a>
     <a href="mailto:fukushino.youmade@gmail.com">お問い合わせ</a>
   </div>
 </footer>
