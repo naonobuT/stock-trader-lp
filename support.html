@@ -113,12 +113,30 @@
   </div>
 
   <!-- お問い合わせ -->
-  <div class="card">
+  <div class="card" id="contact">
     <h2>その他のお問い合わせ</h2>
-    <p>ご購入・動作・その他のご質問はメールにてお気軽にどうぞ。</p>
-    <div class="contact-row">
-      <a href="mailto:fukushino.youmade@gmail.com">fukushino.youmade@gmail.com</a>
-    </div>
+    <p>ご購入・動作・その他のご質問はこちらからどうぞ。通常1〜2営業日以内にご返信します。</p>
+    <form id="contactForm">
+      <label>お名前 <span class="req">*</span></label>
+      <input id="contactName" type="text" placeholder="山田 太郎">
+
+      <label>メールアドレス <span class="req">*</span></label>
+      <input id="contactEmail" type="email" placeholder="example@email.com">
+
+      <label>お問い合わせ種別 <span class="req">*</span></label>
+      <select id="contactCategory" style="width:100%; padding:10px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; margin-bottom:16px;">
+        <option value="">選択してください</option>
+        <option value="購入前の質問">購入前の質問</option>
+        <option value="動作・技術的な問題">動作・技術的な問題</option>
+        <option value="その他">その他</option>
+      </select>
+
+      <label>お問い合わせ内容 <span class="req">*</span></label>
+      <textarea id="contactMessage" rows="5" placeholder="お問い合わせ内容をご記入ください"></textarea>
+
+      <button type="submit" id="contactBtn">送信する</button>
+      <p id="contactMsg" class="result-msg"></p>
+    </form>
   </div>
 </main>
 
@@ -141,6 +159,52 @@ document.getElementById('unlockSerial').addEventListener('input', function() {
     out += v[i];
   }
   this.value = out;
+});
+
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn  = document.getElementById('contactBtn');
+  const msg  = document.getElementById('contactMsg');
+  const name     = document.getElementById('contactName').value.trim();
+  const email    = document.getElementById('contactEmail').value.trim();
+  const category = document.getElementById('contactCategory').value;
+  const message  = document.getElementById('contactMessage').value.trim();
+
+  if (!name || !email || !category || !message) {
+    msg.style.display = 'block';
+    msg.className = 'result-msg result-err';
+    msg.textContent = '✗ 必須項目をすべて入力してください。';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+  msg.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, category, message })
+    });
+    const data = await res.json();
+    msg.style.display = 'block';
+    if (data.ok) {
+      msg.className = 'result-msg result-ok';
+      msg.textContent = '✓ お問い合わせを受け付けました。1〜2営業日以内にご返信します。';
+      this.reset();
+    } else {
+      msg.className = 'result-msg result-err';
+      msg.textContent = '✗ 送信に失敗しました。しばらくしてから再試行してください。';
+    }
+  } catch {
+    msg.style.display = 'block';
+    msg.className = 'result-msg result-err';
+    msg.textContent = '✗ 通信エラーが発生しました。しばらくしてから再試行してください。';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '送信する';
+  }
 });
 
 document.getElementById('unlockForm').addEventListener('submit', async function(e) {
