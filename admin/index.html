@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理画面 | 株トレシミュレーター</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a14; --bg2: #12121e; --bg3: #1a1a2e;
+      --border: #252538; --text: #e2e8f0; --text2: #6b7280;
+      --accent: #6366f1; --green: #10b981; --red: #ef4444; --gold: #fbbf24;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; min-height: 100vh; }
+    header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+    header h1 { font-size: 16px; font-weight: 600; }
+    header span { color: var(--text2); font-size: 12px; }
+    main { padding: 24px; max-width: 1100px; margin: 0 auto; }
+    .hidden { display: none !important; }
+
+    /* ログインフォーム */
+    .login-wrap { display: flex; align-items: center; justify-content: center; height: 80vh; }
+    .login-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 32px; width: 360px; }
+    .login-box h2 { font-size: 16px; margin-bottom: 24px; text-align: center; }
+    .login-box label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+    .login-box input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; color: var(--text); font-size: 14px; outline: none; margin-bottom: 16px; }
+    .login-box input:focus { border-color: var(--accent); }
+    .login-box button { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 10px; font-size: 14px; cursor: pointer; }
+    .login-box button:hover { opacity: 0.85; }
+    .login-error { color: var(--red); font-size: 12px; margin-top: 12px; text-align: center; }
+
+    /* 管理画面 */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+    .stat-num { font-size: 28px; font-weight: 700; }
+    .stat-lbl { color: var(--text2); font-size: 12px; margin-top: 4px; }
+    .stat-num.green { color: var(--green); }
+    .stat-num.gold { color: var(--gold); }
+
+    .search-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+    .search-bar input { flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: var(--text); font-size: 14px; outline: none; }
+    .search-bar input:focus { border-color: var(--accent); }
+    .search-bar button { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 14px; }
+    .search-bar button:hover { opacity: 0.85; }
+    .btn-clear { background: var(--bg3) !important; color: var(--text2) !important; border: 1px solid var(--border) !important; }
+
+    .table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .table-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .table-header span { font-size: 12px; color: var(--text2); }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background: var(--bg3); padding: 10px 12px; text-align: left; font-size: 11px; text-transform: uppercase; color: var(--text2); letter-spacing: 0.05em; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    tbody tr:hover { background: var(--bg3); }
+    tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .badge.activated { background: rgba(16,185,129,0.15); color: var(--green); }
+    .badge.pending { background: rgba(107,114,128,0.15); color: var(--text2); }
+    .btn-reset { background: transparent; border: 1px solid var(--red); color: var(--red); border-radius: 4px; padding: 3px 10px; font-size: 12px; cursor: pointer; }
+    .btn-reset:hover { background: rgba(239,68,68,0.1); }
+    .text-mono { font-family: 'Courier New', monospace; font-size: 12px; }
+    .text-muted { color: var(--text2); }
+    .empty { text-align: center; padding: 40px; color: var(--text2); }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .modal-overlay.hidden { display: none; }
+    .modal-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 360px; }
+    .modal-box h2 { font-size: 16px; margin-bottom: 8px; }
+    .modal-box p { color: var(--text2); font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
+    .modal-box .serial-display { background: var(--bg3); border-radius: 6px; padding: 8px 12px; font-family: monospace; color: var(--accent); margin-bottom: 20px; font-size: 14px; text-align: center; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .modal-actions button { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; }
+    .btn-cancel { background: var(--bg3); color: var(--text); border: 1px solid var(--border) !important; }
+    .btn-confirm { background: var(--red); color: #fff; }
+    .btn-confirm:hover { opacity: 0.85; }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .toast.success { background: var(--green); color: #fff; }
+    .toast.error { background: var(--red); color: #fff; }
+
+    #loading { text-align: center; padding: 60px; color: var(--text2); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>管理画面</h1>
+    <span>株トレシミュレーター</span>
+    <button id="logoutBtn" onclick="logout()" class="hidden" style="margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;">ログアウト</button>
+  </header>
+
+  <!-- ログインフォーム -->
+  <div class="login-wrap" id="loginView">
+    <div class="login-box">
+      <h2>ログイン</h2>
+      <label for="loginUser">メールアドレス</label>
+      <input type="email" id="loginUser" autocomplete="username" placeholder="メールアドレス">
+      <label for="loginPass">パスワード</label>
+      <input type="password" id="loginPass" autocomplete="current-password" placeholder="パスワード" onkeydown="if(event.key==='Enter')doLogin()">
+      <button onclick="doLogin()">ログイン</button>
+      <div class="login-error hidden" id="loginError">IDまたはパスワードが正しくありません</div>
+    </div>
+  </div>
+
+  <!-- 管理画面 -->
+  <main id="adminView" class="hidden">
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-num" id="statTotal">-</div>
+        <div class="stat-lbl">累計販売数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num green" id="statActivated">-</div>
+        <div class="stat-lbl">アクティベート済み</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num gold" id="statPending">-</div>
+        <div class="stat-lbl">未アクティベート</div>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="メールアドレスまたはシリアルコードで検索...">
+      <button onclick="applySearch()">検索</button>
+      <button class="btn-clear" onclick="clearSearch()">クリア</button>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <span id="countLabel">読み込み中...</span>
+      </div>
+      <div id="loading">読み込み中...</div>
+      <table id="purchaseTable" style="display:none">
+        <thead>
+          <tr>
+            <th>購入日時</th>
+            <th>メールアドレス</th>
+            <th>シリアルコード</th>
+            <th>状態</th>
+            <th>アクティベート日時</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <div class="modal-overlay hidden" id="resetModal">
+    <div class="modal-box">
+      <h2>デバイスリセット</h2>
+      <p>このシリアルコードのデバイス認証をリセットします。<br>別のPCで再アクティベートできるようになります。</p>
+      <div class="serial-display" id="modalSerial"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+        <button class="btn-confirm" onclick="confirmReset()">リセットする</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let TOKEN = localStorage.getItem('adminToken');
+    let allRows = [];
+    let targetSerial = null;
+
+    function showAdmin() {
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('adminView').classList.remove('hidden');
+      document.getElementById('logoutBtn').classList.remove('hidden');
+      fetchPurchases();
+    }
+
+    function showLogin() {
+      document.getElementById('loginView').classList.remove('hidden');
+      document.getElementById('adminView').classList.add('hidden');
+      document.getElementById('logoutBtn').classList.add('hidden');
+    }
+
+    async function doLogin() {
+      const user = document.getElementById('loginUser').value.trim();
+      const pass = document.getElementById('loginPass').value;
+      document.getElementById('loginError').classList.add('hidden');
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user, pass })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          TOKEN = data.token;
+          localStorage.setItem('adminToken', TOKEN);
+          showAdmin();
+        } else {
+          document.getElementById('loginError').classList.remove('hidden');
+        }
+      } catch {
+        document.getElementById('loginError').classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('adminToken');
+      TOKEN = null;
+      allRows = [];
+      showLogin();
+    }
+
+    async function fetchPurchases() {
+      try {
+        const res = await fetch('/api/admin/purchases', {
+          headers: { 'Authorization': 'Bearer ' + TOKEN }
+        });
+        if (res.status === 401) { logout(); return; }
+        allRows = await res.json();
+        renderTable(allRows);
+      } catch {
+        showToast('データの取得に失敗しました', 'error');
+      }
+    }
+
+    function renderTable(rows) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('purchaseTable').style.display = 'table';
+
+      const activated = allRows.filter(r => r.activated).length;
+      document.getElementById('statTotal').textContent = allRows.length;
+      document.getElementById('statActivated').textContent = activated;
+      document.getElementById('statPending').textContent = allRows.length - activated;
+      document.getElementById('countLabel').textContent = `${rows.length} 件`;
+
+      const tbody = document.getElementById('tableBody');
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">該当するデータがありません</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td class="text-muted">${formatDate(r.created_at)}</td>
+          <td>${escHtml(r.email)}</td>
+          <td class="text-mono">${escHtml(r.serial)}</td>
+          <td>${r.activated
+            ? '<span class="badge activated">認証済み</span>'
+            : '<span class="badge pending">未認証</span>'}</td>
+          <td class="text-muted">${r.activated_at ? formatDate(r.activated_at) : '-'}</td>
+          <td>${r.activated
+            ? `<button class="btn-reset" onclick="openResetModal('${escHtml(r.serial)}')">移行を許可</button>`
+            : '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function applySearch() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      if (!q) { renderTable(allRows); return; }
+      renderTable(allRows.filter(r =>
+        r.email.toLowerCase().includes(q) || r.serial.toLowerCase().includes(q)
+      ));
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      renderTable(allRows);
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') applySearch();
+    });
+
+    function openResetModal(serial) {
+      targetSerial = serial;
+      document.getElementById('modalSerial').textContent = serial;
+      document.getElementById('resetModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      targetSerial = null;
+      document.getElementById('resetModal').classList.add('hidden');
+    }
+
+    async function confirmReset() {
+      if (!targetSerial) return;
+      closeModal();
+      try {
+        const res = await fetch('/api/admin/reset-device', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ serial: targetSerial })
+        });
+        if (res.ok) {
+          showToast('デバイスをリセットしました', 'success');
+          fetchPurchases();
+        } else {
+          const data = await res.json();
+          showToast(data.message || 'リセットに失敗しました', 'error');
+        }
+      } catch {
+        showToast('リセットに失敗しました', 'error');
+      }
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '-';
+      return new Date(iso).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    if (TOKEN) { showAdmin(); } else { showLogin(); }
+  </script>
+</body>
+</html>
